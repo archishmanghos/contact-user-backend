@@ -1,0 +1,21 @@
+version: '3'
+services:
+        contacts-app:
+            container_name: express-contacts-app
+            image: semicolonised/my-contacts-backend:1.0.2
+            restart: always
+            build: .
+            ports:
+                - '5000:5001'
+            environment:
+                PORT : 5001
+                CONNECTION_STRING : mongodb+srv://semicolonised:archi1225@archicluster.mqbfncb.mongodb.net/mycontacts-backend?retryWrites=true&w=majority
+                ACCESS_TOKEN_SECRET : archi@2000
+            links:
+                - mongo
+        
+        mongo:
+            container_name: mongo
+            image: mongo
+            volumes:
+                - ./data:/data/db
