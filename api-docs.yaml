@@ -1,0 +1,314 @@
+openapi: 3.0.0
+info:
+    title: User-Contact Backend Application using Node JS
+    version: 1.0.0
+    description: API documentation of the app using Swagger API
+    contact:
+        name: Archishman Ghosh
+        email: aghosh@argusoft.com
+    license:
+        name: Apache 2.0
+        url: http://www.apache.org/licenses/LICENSE-2.0.html
+
+components:
+    responses:
+        ValidationError: 
+            description: One or more mandatory fields were either empty or incorrect
+            content:
+                application/json:
+                    schema:
+                        $ref: '#/components/schemas/Error'
+        NotFound:
+            description: The specified resource was not found
+            content:
+                application/json:
+                    schema:
+                        $ref: '#/components/schemas/Error'
+        Unauthorized:
+            description: Unauthorized
+            content:
+                application/json:
+                    schema:
+                        $ref: '#/components/schemas/Error'
+
+        Forbidden:
+            description: User not allowed to execute
+            content:
+                application/json:
+                    schema:
+                        $ref: '#/components/schemas/Error'
+
+    schemas:
+        Error:
+            type: object
+            properties:
+                title:
+                    type: string
+                message:
+                    type: string
+                stackTrace:
+                    type: string
+            required:
+                - title
+                - message
+                - stackTrace
+        User:
+            type: object
+            properties:
+                _id:
+                    type: string
+                user_id:
+                    type: string
+                name:
+                    type: string
+                email:
+                    type: string
+                phone:
+                    type: string
+                createdAt:
+                    type: string
+                updatedAt:
+                    type: string
+                __v:
+                    type: string
+    securitySchemes:
+        bearerAuth:
+            type: http
+            scheme: bearer
+            bearerFormat: JWT
+
+servers:
+    - url: http://localhost:{port}/api
+      description: This is the local server URL used to run the application in a dev environment
+      variables:
+        port:
+            enum:
+                - '5000'
+                - '5001'
+            default: '5001'
+    - url: http://apps.argusoft.com/api
+      description: This is the remote server URL used to run the application in a production environment
+
+paths:
+    /users/register:
+        post:
+            summary: This registers/creates a new User
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                username:
+                                    type: string
+                                email:
+                                    type: string
+                                password:
+                                    type: string
+            responses:
+                '201':
+                    description: created user successfully and saved to database.
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    _id:
+                                        type: string
+                                    username:
+                                        type: string
+                                    email:
+                                        type: string
+                '400':
+                    $ref: '#/components/responses/ValidationError'
+
+    /users/login:
+        post:
+            security:
+                - bearerAuth: []
+            summary: This enables a registered user to login into the app
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                email:
+                                    type: string
+                                password:
+                                    type: string
+            responses:
+                '200':
+                    description: Successful response
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    accessToken:
+                                        type: string
+                '400':
+                    $ref: '#/components/responses/Unauthorized'
+    /users/current:
+        get:
+            security:
+                - bearerAuth: []
+            summary: Returns the current logged in user
+            responses:
+                '200':
+                    description: Successful response
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    id:
+                                        type: string
+                                    username:
+                                        type: string
+                                    email:
+                                        type: string
+                '404':
+                    $ref: '#/components/responses/NotFound'
+
+    /contacts:
+        get:
+            security:
+                - bearerAuth: []
+            summary: Return all contacts of the current user
+            responses:
+                '200':
+                    description: Successful response
+                    content:
+                        application/json:
+                            schema:
+                                type: array
+                                items:
+                                    $ref: '#/components/schemas/User'
+        
+        post:
+            security:
+                - bearerAuth: []
+            summary: Create a new contact of the current user
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                name:
+                                    type: string
+                                email:
+                                    type: string
+                                phone:
+                                    type: string
+            responses:
+                '201':
+                    description: Successfully Creation
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    user_id:
+                                        type: string
+                                    name:
+                                        type: string
+                                    email:
+                                        type: string
+                                    phone:
+                                        type: string
+                '400':
+                    $ref: '#/components/responses/ValidationError'
+
+    
+    /contacts/{id}:
+        get:
+            security:
+                - bearerAuth: []
+            summary: Return the contact associated with the given id of the current user
+            parameters:
+                - in: path
+                  name: id
+                  schema:
+                    type: string
+                  required: true
+                  description: Object ID of the user to get
+            responses:
+                '200':
+                    description: Successful response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/User'
+                '404':
+                    $ref: '#/components/responses/NotFound'
+        put:
+            security:
+                - bearerAuth: []
+            summary: Update the contact, associated with the given id of the current user, with the new data
+            parameters:
+                - in: path
+                  name: id
+                  schema:
+                    type: string
+                  required: true
+                  description: Object ID of the user to get
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                name:
+                                    type: string
+                                email:
+                                    type: string
+                                phone:
+                                    type: string
+            responses:
+                '200':
+                    description: Successful response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/User'
+                '404':
+                    $ref: '#/components/responses/NotFound'
+                '403':
+                    $ref: '#/components/responses/Forbidden'
+
+        delete:
+            security:
+                - bearerAuth: []
+            summary: Delete the contact, associated with the given id of the current user.
+            parameters:
+                - in: path
+                  name: id
+                  schema:
+                    type: string
+                  required: true
+                  description: Object ID of the user to get
+            responses:
+                '200':
+                    description: Successful response
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    acknowledged:
+                                        type: boolean
+                                    deletedCount:
+                                        type: integer
+                '404':
+                    $ref: '#/components/responses/NotFound'
+                '403':
+                    $ref: '#/components/responses/Forbidden'
+
+
+                            
