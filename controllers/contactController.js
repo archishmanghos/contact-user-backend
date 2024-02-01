@@ -19,6 +19,10 @@ const getAllContacts = asyncHandler(
 // @status done
 const getContactWithId = asyncHandler(
     async (req, res) => {
+        if (req.params.id.toString().length < 24) {
+            res.status(constants.VALIDATION_ERROR);
+            throw new Error(`Id should be a minimum of 24 characters. Given length is : ${req.params.id.toString().length}`);
+        }
         const contact = await Contact.findById(req.params.id);
         if (!contact) {
             res.status(constants.NOT_FOUND);
@@ -56,6 +60,10 @@ const createContact = asyncHandler(
 // @status done
 const updateContactWithId = asyncHandler(
     async (req, res) => {
+        if (req.params.id.toString().length < 24) {
+            res.status(constants.VALIDATION_ERROR);
+            throw new Error(`Id should be a minimum of 24 characters. Given length is : ${req.params.id.toString().length}`);
+        }
         const contact = await Contact.findById(req.params.id);
         if (!contact) {
             res.status(constants.NOT_FOUND);
@@ -82,7 +90,12 @@ const updateContactWithId = asyncHandler(
 // @access  private
 const deleteContactWithId = asyncHandler(
     async (req, res) => {
+        if (req.params.id.toString().length < 24) {
+            res.status(constants.VALIDATION_ERROR);
+            throw new Error(`Id should be a minimum of 24 characters. Given length is : ${req.params.id.toString().length}`);
+        }
         const contact = await Contact.findById(req.params.id);
+        console.log(contact);
         if (!contact) {
             res.status(constants.NOT_FOUND);
             throw new Error(`Contact not found with given id: ${req.params.id}`);

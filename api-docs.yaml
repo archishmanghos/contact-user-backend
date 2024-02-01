@@ -83,7 +83,6 @@ servers:
       variables:
         port:
             enum:
-                - '5000'
                 - '5001'
             default: '5001'
     - url: http://apps.argusoft.com/api
@@ -125,8 +124,6 @@ paths:
 
     /users/login:
         post:
-            security:
-                - bearerAuth: []
             summary: This enables a registered user to login into the app
             requestBody:
                 required: true
@@ -211,16 +208,7 @@ paths:
                     content:
                         application/json:
                             schema:
-                                type: object
-                                properties:
-                                    user_id:
-                                        type: string
-                                    name:
-                                        type: string
-                                    email:
-                                        type: string
-                                    phone:
-                                        type: string
+                                $ref: '#/components/schemas/User'
                 '400':
                     $ref: '#/components/responses/ValidationError'
 

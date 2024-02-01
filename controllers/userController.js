@@ -13,7 +13,7 @@ const registerUser = asyncHandler(
         const { username, email, password } = req.body;
         if (!username || !email || !password) {
             res.status(constants.VALIDATION_ERROR);
-            throw new Error('User already registered!');
+            throw new Error('All fields are mandatory!');
         }
 
         const userAvailable = await User.findOne({ email });
@@ -78,6 +78,7 @@ const loginUser = asyncHandler(
 // @status not-done
 const currentUser = asyncHandler(
     async (req, res) => {
+        console.log(req.body);
         res.status(200).json(req.user);
     }
 )
